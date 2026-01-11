@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "@/Components/Header/header";
+import Footer from "@/Components/Footer/footer";
+import TanStackProvider from "../Components/TanStackProvider/TanStackProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +28,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <TanStackProvider>
+        <Header />
         {children}
+        <Footer />
+        <div id="modal-root" />
+        </TanStackProvider>
       </body>
     </html>
   );
