@@ -1,20 +1,24 @@
 import { fetchNoteById } from '@/lib/api';
-import Modal from '@/components/Modal/Modal';
+import NotePreviewClient from "./NotePreview.client";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
-const NotePreview = async ({ params }: Props) => {
+export default async function NotePreview({ params }: Props) {
   const { id } = await params;
   const note = await fetchNoteById(id);
 
-  return (
-    <Modal>
-      <h2>{note.title}</h2>
-      <p>{note.content}</p>
-    </Modal>
-  );
-};
+  const dateLabel = note.updatedAt
+    ? `Updated at: ${note.updatedAt}`
+    : `Created at: ${note.createdAt}`;
 
-export default NotePreview;
+ return (
+    <NotePreviewClient
+      title={note.title}
+      content={note.content}
+      tag={note.tag}
+      dateLabel={dateLabel}
+    />
+  );
+}

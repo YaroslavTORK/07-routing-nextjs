@@ -1,15 +1,8 @@
-"use client"
-import { useEffect } from "react";
+"use client";
+import { useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import css from "./Modal.module.css";
 import { useRouter } from "next/navigation";
-
-interface ModalProps {
-  children: React.ReactNode;
-  onClose?: () => void;
-}
-
-
 
 interface ModalProps {
   children: React.ReactNode;
@@ -24,6 +17,11 @@ export default function Modal({ children, onClose }: ModalProps) {
     else router.back();
   };
 
+  const modalRoot = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    return document.getElementById("modal-root");
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
@@ -37,21 +35,21 @@ export default function Modal({ children, onClose }: ModalProps) {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalOverflow;
     };
-  }, []);
+  }, [onClose]);
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) close();
   };
 
-  const modalRoot =
-    typeof document !== "undefined"
-      ? document.getElementById("modal-root")
-      : null;
-
   if (!modalRoot) return null;
 
   return createPortal(
-    <div className={css.backdrop} role="dialog" aria-modal="true" onClick={handleBackdropClick}>
+    <div
+      className={css.backdrop}
+      role="dialog"
+      aria-modal="true"
+      onClick={handleBackdropClick}
+    >
       <div className={css.modal}>{children}</div>
     </div>,
     modalRoot
@@ -74,7 +72,7 @@ export default function Modal({ children, onClose }: ModalProps) {
 //     if (!modalRoot) return;
 //     const handleKeyDown = (event: KeyboardEvent) => {
 //       if (event.key === "Escape") close();
-      
+
 //     };
 
 //     const originalOverflow = document.body.style.overflow;
@@ -92,7 +90,7 @@ export default function Modal({ children, onClose }: ModalProps) {
 //       close();
 //     }
 //   };
-  
+
 //   if (!modalRoot) return null;
 
 //   return createPortal(

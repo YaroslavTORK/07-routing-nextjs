@@ -60,15 +60,15 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   const res = await api.get<Note>(`/notes/${id}`);
   return res.data;
 };
-export type Category = {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-};
+// export type Category = {
+//   id: string;
+//   name: string;
+//   description: string;
+//   createdAt: string;
+//   updatedAt: string;
+// };
 
-export const getCategories = async () => {
-  const res = await axios<Category[]>('/categories');
-  return res.data;
-};
+// export const getCategories = async () => {
+//   const res = await axios<Category[]>('/categories');
+//   return res.data;
+// };
