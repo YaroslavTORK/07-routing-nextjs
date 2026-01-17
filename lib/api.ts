@@ -14,6 +14,7 @@ export interface FetchNotesParams {
   page: number;
   perPage: number;
   search?: string;
+  tag?: NoteTags;
 }
 export interface FetchNotesResponse {
   notes: Note[];
@@ -27,6 +28,7 @@ export async function fetchNotes(
       page: params.page,
       perPage: params.perPage,
       search: params.search,
+      tag: params.tag,
     },
   });
 
@@ -56,5 +58,17 @@ export async function deleteNote(id: string): Promise<DeleteNoteResponse> {
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
   const res = await api.get<Note>(`/notes/${id}`);
+  return res.data;
+};
+export type Category = {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const getCategories = async () => {
+  const res = await axios<Category[]>('/categories');
   return res.data;
 };
