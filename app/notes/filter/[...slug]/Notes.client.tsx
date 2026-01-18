@@ -1,7 +1,5 @@
 "use client";
-
-import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import css from "./NotesPage.module.css";
 import { useDebounce } from "use-debounce";
 import { fetchNotes } from "@/lib/api";
@@ -20,39 +18,32 @@ type Props = {
 };
 
 export default function NotesClient({ tag }: Props) {
- const router = useRouter();
-  const searchParams = useSearchParams();
-  const page = useMemo(() => {
-    const value = Number(searchParams.get("page") ?? "1");
-    return Number.isFinite(value) && value > 0 ? value : 1;
-  }, [searchParams]);
-
+  const [page, setPage] = useState(1);
+    
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedSearch] = useDebounce(searchText, 400);
+  
+  useEffect(() => {
+    setPage(1);
+  }, [tag]);
 
   const search = debouncedSearch.trim() || undefined;
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", page, PER_PAGE, debouncedSearch, tag],
-    queryFn: () => fetchNotes({
-      page,
-      perPage: PER_PAGE,
-      search,
-      tag,
-    }),
-    placeholderData: (previousData) => previousData,
-  });
+  const { data, isLoading, isError, isFetching } = useQuery({
+  queryKey: ["notes", page, PER_PAGE, debouncedSearch, tag],
+  queryFn: () => fetchNotes({ page, perPage: PER_PAGE, search, tag }),
+});
 
   const notes = data?.notes ?? [];
   const totalPages = data?.totalPages ?? 0;
 
   const onSearchChange = (value: string) => {
     setSearchText(value);
-    router.push(`?page=1`);
+    setPage(1);
   };
   
   const onPageChange = (nextPage: number) => {
-    router.push(`?page=${nextPage}`);
+    setPage(nextPage);
   };
 
   return (
@@ -69,9 +60,11 @@ export default function NotesClient({ tag }: Props) {
         </button>
       </header>
 
-      {isLoading && <p>Loading...</p>}
+      {(isLoading || isFetching) && <p>Loading...</p>}
       {isError && <p>Something went wrong</p>}
-      {!isLoading && !isError && notes.length > 0 && <NoteList notes={notes} />}
+      {!isError && !isLoading && !isFetching && notes.length > 0 && (
+  <NoteList notes={notes} />
+)}
 
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
